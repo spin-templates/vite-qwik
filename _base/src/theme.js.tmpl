@@ -1,0 +1,36 @@
+const STORAGE_KEY = 'theme'
+
+export function resolveTheme(pref) {
+  if (typeof window === 'undefined') return 'light'
+  const mq = window.matchMedia('(prefers-color-scheme: dark)')
+  return pref === 'system' ? (mq.matches ? 'dark' : 'light') : pref
+}
+
+export function getThemePref() {
+  if (typeof window === 'undefined') return 'system'
+  const stored = localStorage.getItem(STORAGE_KEY)
+  return stored === 'light' || stored === 'dark' || stored === 'system'
+    ? stored
+    : 'system'
+}
+
+function apply() {
+  if (typeof window === 'undefined') return
+  const resolved = resolveTheme(getThemePref())
+  const root = document.documentElement
+  root.dataset.theme = resolved
+  root.style.colorScheme = resolved
+  root.style.background = resolved === 'dark' ? '#0c0a09' : '#e5ddd0'
+}
+
+export function initTheme() {
+  if (typeof window === 'undefined') return
+  apply()
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', apply)
+}
+
+export function setTheme(pref) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(STORAGE_KEY, pref)
+  apply()
+}

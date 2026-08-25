@@ -1,0 +1,34 @@
+import { component$, useSignal, useVisibleTask$ } from '@builder.io/qwik'
+import { getThemePref, setTheme, type ThemePref } from './theme.ts'
+
+const options: { value: ThemePref; label: string }[] = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System' },
+]
+
+export const ThemeSwitcher = component$(() => {
+  const pref = useSignal<ThemePref>('system')
+
+  useVisibleTask$(() => {
+    pref.value = getThemePref()
+  })
+
+  return (
+    <div class="theme-switcher" role="group" aria-label="Color theme">
+      {options.map(({ value, label }) => (
+        <button
+          type="button"
+          class={pref.value === value ? 'active' : undefined}
+          aria-pressed={pref.value === value}
+          onClick$={() => {
+            setTheme(value)
+            pref.value = value
+          }}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+})
